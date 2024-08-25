@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Roll Number</title>
+    <link rel="stylesheet" href="styles.css"> 
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .response {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Submit JSON Input</h2>
+    <input type="text" id="jsonInput" placeholder='Enter JSON e.g. {"data": ["A","C","z"]}'>
+    <button onclick="submitData()">Submit</button>
+
+    <select id="filterSelect" multiple>
+        <option value="alphabets">Alphabets</option>
+        <option value="numbers">Numbers</option>
+        <option value="highest_lowercase_alphabet">Highest Lowercase Alphabet</option>
+    </select>
+
+    <div class="response" id="responseDiv"></div>
+</div>
+
+<script>
+    const apiUrl = 'https://your-backend-url.com/bfhl'; // Replace with your backend URL
+
+    function submitData() {
+        const input = document.getElementById('jsonInput').value;
+        let parsedInput;
+        try {
+            parsedInput = JSON.parse(input);
+        } catch (e) {
+            alert('Invalid JSON format');
+            return;
+        }
+
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(parsedInput)
+        })
+        .then(response => response.json())
+        .then(data => {
+            renderResponse(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while processing the request.');
+        });
+    }
+
+    function renderResponse(data) {
+        const filterSelect = document.getElementById('filterSelect');
+        const selectedOptions = Array.from(filterSelect.selectedOptions).map(option => option.value);
+
+        const responseDiv = document.getElementById('responseDiv');
+        responseDiv.innerHTML = '';
+
+        if (selectedOptions.includes('alphabets')) {
+            responseDiv.innerHTML += `<p>Alphabets: ${JSON.stringify(data.alphabets)}</p>`;
+        }
+        if (selectedOptions.includes('numbers')) {
+            responseDiv.innerHTML += `<p>Numbers: ${JSON.stringify(data.numbers)}</p>`;
+        }
+        if (selectedOptions.includes('highest_lowercase_alphabet')) {
+            responseDiv.innerHTML += `<p>Highest Lowercase Alphabet: ${JSON.stringify(data.highest_lowercase_alphabet)}</p>`;
+        }
+    }
+</script>
+
+</body>
+</html>
